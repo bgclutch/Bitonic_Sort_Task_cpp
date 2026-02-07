@@ -1,0 +1,5 @@
+/home/bog/Desktop/projects/Bitonic_Sort_Task_cpp/build/CMakeFiles/edit_cache.dir
+/home/bog/Desktop/projects/Bitonic_Sort_Task_cpp/build/CMakeFiles/rebuild_cache.dir
+/home/bog/Desktop/projects/Bitonic_Sort_Task_cpp/build/bitonic_sort/CMakeFiles/bitonic_sort.dir
+/home/bog/Desktop/projects/Bitonic_Sort_Task_cpp/build/bitonic_sort/CMakeFiles/edit_cache.dir
+/home/bog/Desktop/projects/Bitonic_Sort_Task_cpp/build/bitonic_sort/CMakeFiles/rebuild_cache.dir
