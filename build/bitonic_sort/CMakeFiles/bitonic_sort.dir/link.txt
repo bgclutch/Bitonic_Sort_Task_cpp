@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/bitonic_sort.dir/src/main.cpp.o -o bitonic_sort
