@@ -1,4 +1,4 @@
-__kernel void bitonic_sort_kernel(__global int* data, int stage, int step) {
+__kernel void naive_bitonic_sort_kernel(__global int* data, int stage, int step) {
     int cur_id = get_global_id(0);
     int cur_partner = cur_id + step;
 
