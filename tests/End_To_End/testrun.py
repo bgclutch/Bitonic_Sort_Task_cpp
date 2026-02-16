@@ -20,7 +20,7 @@ for file in test_files:
             stdin=fin,
             text=True,
             capture_output=True,
-            cwd="../../build/bitonic_sort/"
+            cwd="../../build/bitonic_sort"
         )
         if run.returncode != 0:
             fout.write(f"ERROR: {run.stderr}\n")

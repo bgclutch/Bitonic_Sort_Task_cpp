@@ -6,6 +6,14 @@
 #include <CL/opencl.hpp>
 
 namespace ocl_utils {
+    int closest_pow_of_2(const int size) noexcept {
+        int power = 1;
+        while (size > power)
+            power *= 2;
+
+        return power;
+    }
+
     class Environment final {
      private:
         cl::Platform platform_;
@@ -25,27 +33,27 @@ namespace ocl_utils {
         kernel_   = create_kernel(program_, kernel_name);
         };
 
-        cl::Device& get_device() {
+        cl::Device& get_device() noexcept {
             return device_;
         }
 
-        cl::Platform& get_platform() {
+        cl::Platform& get_platform() noexcept {
            return platform_;
         }
 
-        cl::Context& get_context() {
+        cl::Context& get_context() noexcept {
             return context_;
         }
 
-        cl::Program& get_program() {
+        cl::Program& get_program() noexcept {
             return program_;
         }
 
-        cl::CommandQueue& get_queue() {
+        cl::CommandQueue& get_queue() noexcept {
             return queue_;
         }
 
-        cl::Kernel& get_kernel() {
+        cl::Kernel& get_kernel() noexcept {
             return kernel_;
         }
 

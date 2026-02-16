@@ -3,10 +3,10 @@
 
 
 namespace config {
-#ifdef KERNELS_ABS_PATH
-const std::string KERNELS_DIR_PATH = KERNELS_ABS_PATH;
+#ifdef KERNELS_DIR_PATH
+    const std::string KERNELS_PATH = KERNELS_DIR_PATH;
 #else
-const std::string KERNELS_DIR_PATH = "kernels/";
+    const std::string KERNELS_PATH = "kernels/";
 #endif
 
 const std::string NAIVE_BITONIC_KERNEL      = "naive_kernel.cl";
