@@ -66,6 +66,20 @@ void fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& d
                 cl::Local(localSize * sizeof(ElemType)),
                 localSize);
 
+    if (paddedSize > localSize) {
+        ocl_utils::Environment localNaive(env, config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
+        auto mergeCall = cl::KernelFunctor<cl::Buffer, int, int>(localNaive.get_kernel());
+
+        for (int stage = localSize; stage <= paddedSize; stage *= 2) {
+            for (int step = stage / 2; step > 0; step /= 2) {
+                mergeCall(cl::EnqueueArgs(localNaive.get_queue(), cl::NDRange(paddedSize)),
+                kernel_buf,
+                stage,
+                step);
+            }
+        }
+    }
+
     env.get_queue().enqueueReadBuffer(kernel_buf, CL_TRUE, 0, bytes, data.data());
 }
 

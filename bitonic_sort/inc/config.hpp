@@ -3,8 +3,8 @@
 
 
 namespace config {
-#ifdef KERNELS_DIR_PATH
-    const std::string KERNELS_PATH = KERNELS_DIR_PATH;
+#ifdef KERNELS_ABS_PATH
+    const std::string KERNELS_PATH = KERNELS_ABS_PATH;
 #else
     const std::string KERNELS_PATH = "kernels/";
 #endif

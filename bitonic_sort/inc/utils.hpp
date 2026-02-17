@@ -33,13 +33,24 @@ namespace ocl_utils {
 
      public:
         Environment(const std::string& kernel_path, const std::string& kernel_name) {
-        platform_    = select_platform();
-        device_      = select_device(platform_);
-        context_     = create_context(device_);
-        queue_       = create_queue(context_, device_);
-        program_     = create_program(context_, device_, kernel_path);
-        kernel_      = create_kernel(program_, kernel_name);
-        kernel_name_ = select_kernel_name(kernel_name);
+            platform_    = select_platform();
+            device_      = select_device(platform_);
+            context_     = create_context(device_);
+            queue_       = create_queue(context_, device_);
+            program_     = create_program(context_, device_, kernel_path);
+            kernel_      = create_kernel(program_, kernel_name);
+            kernel_name_ = select_kernel_name(kernel_name);
+        };
+
+        Environment(const Environment& other, const std::string& kernel_path, const std::string& kernel_name) :
+            platform_(other.platform_),
+            device_(other.device_),
+            context_(other.context_),
+            queue_(other.queue_)
+        {
+            program_     = create_program(context_, device_, kernel_path);
+            kernel_      = create_kernel(program_, kernel_name);
+            kernel_name_ = select_kernel_name(kernel_name);
         };
 
         cl::Device& get_device() noexcept {
@@ -85,15 +96,28 @@ namespace ocl_utils {
 
         cl::Program create_program(cl::Context& context, cl::Device& device, const std::string& kernel_path) {
             std::ifstream bitonicKernelFile(kernel_path);
+
+            if (!bitonicKernelFile.is_open()) {
+                std::cerr << "CRITICAL ERROR: Could not open kernel file!" << std::endl;
+                std::cerr << "Looked at: " << kernel_path << std::endl;
+                throw std::runtime_error("File not found");
+            }
+
             std::string sourceCode((std::istreambuf_iterator<char>(bitonicKernelFile)), std::istreambuf_iterator<char>());
             cl::Program::Sources sources;
             sources.push_back({sourceCode.c_str(), sourceCode.length()});
+
+            if (sourceCode.empty()) {
+                std::cerr << "CRITICAL ERROR: Kernel file is EMPTY!" << std::endl;
+                throw std::runtime_error("Empty source code");
+            }
 
             cl::Program program(context, sources);
             if (program.build({device}) != CL_SUCCESS) {
                 std::cerr << "Build Log:\n" << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
                 throw std::runtime_error("program wasn't built");
             }
+
             return program;
         }
 
@@ -108,7 +132,16 @@ namespace ocl_utils {
         }
 
         cl::Kernel create_kernel(cl::Program& program, const std::string& kernel_name) {
-            cl::Kernel kernel(program, kernel_name.c_str());
+            cl_int err;
+            cl::Kernel kernel(program, kernel_name.c_str(), &err);
+            if (err != CL_SUCCESS) {
+                std::cerr << "GPU Error: " << err << std::endl;
+                throw std::runtime_error("no kernel creation");
+            }
+
+            if (err == CL_INVALID_KERNEL_NAME) {
+                std::cerr << "Hint: Check spelling in .cl file!" << std::endl;
+                }
             return kernel;
         }
 

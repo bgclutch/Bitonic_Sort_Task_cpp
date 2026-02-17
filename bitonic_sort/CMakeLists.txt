@@ -2,7 +2,7 @@ find_package(OpenCL REQUIRED)
 add_executable(bitonic_sort)
 
 target_compile_definitions(bitonic_sort PRIVATE
-    KERNELS_ABS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/kernels/"
+    KERNELS_ABS_PATH="${CMAKE_SOURCE_DIR}/kernels/"
 )
 target_compile_definitions(bitonic_sort PRIVATE
     CL_TARGET_OPENCL_VERSION=200
