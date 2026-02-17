@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
-
 project(bitonic_sort)
+find_package(OpenCL REQUIRED)
+
 add_subdirectory(bitonic_sort)
+add_subdirectory(tests)
 
 option(ENABLE_ASAN OFF)
-
-target_compile_features(bitonic_sort PUBLIC cxx_std_23)
 
 target_compile_options(bitonic_sort PRIVATE
 $<$<CONFIG:Debug>:
@@ -20,6 +20,8 @@ $<$<CONFIG:Debug>:
 )
 
 if(ENABLE_ASAN)
-    target_compile_options(bitonic_sort PRIVATE $<$<CONFIG:Debug>: -fsanitize=address>)
-    target_link_options(bitonic_sort PRIVATE $<$<CONFIG:Debug>: -fsanitize=address>)
+    foreach(target bitonic_sort tests)
+        target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>: -fsanitize=address>)
+        target_link_options(${target} PRIVATE $<$<CONFIG:Debug>: -fsanitize=address>)
+    endforeach()
 endif()
