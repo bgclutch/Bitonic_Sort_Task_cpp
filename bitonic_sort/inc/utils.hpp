@@ -1,4 +1,5 @@
 #pragma once
+#include "config.hpp"
 #include <vector>
 #include <string>
 #include <fstream>
@@ -14,6 +15,12 @@ namespace ocl_utils {
         return power;
     }
 
+     enum class Kernel_Names {
+        naive,
+        fast,
+        error
+    };
+
     class Environment final {
      private:
         cl::Platform platform_;
@@ -22,15 +29,17 @@ namespace ocl_utils {
         cl::CommandQueue queue_;
         cl::Program program_;
         cl::Kernel kernel_;
+        Kernel_Names kernel_name_;
 
      public:
         Environment(const std::string& kernel_path, const std::string& kernel_name) {
-        platform_ = select_platform();
-        device_   = select_device(platform_);
-        context_  = create_context(device_);
-        queue_    = create_queue(context_, device_);
-        program_  = create_program(context_, device_, kernel_path);
-        kernel_   = create_kernel(program_, kernel_name);
+        platform_    = select_platform();
+        device_      = select_device(platform_);
+        context_     = create_context(device_);
+        queue_       = create_queue(context_, device_);
+        program_     = create_program(context_, device_, kernel_path);
+        kernel_      = create_kernel(program_, kernel_name);
+        kernel_name_ = select_kernel_name(kernel_name);
         };
 
         cl::Device& get_device() noexcept {
@@ -55,6 +64,10 @@ namespace ocl_utils {
 
         cl::Kernel& get_kernel() noexcept {
             return kernel_;
+        }
+
+        Kernel_Names& get_kernel_name() noexcept {
+            return kernel_name_;
         }
 
      private:
@@ -97,6 +110,18 @@ namespace ocl_utils {
         cl::Kernel create_kernel(cl::Program& program, const std::string& kernel_name) {
             cl::Kernel kernel(program, kernel_name.c_str());
             return kernel;
+        }
+
+        Kernel_Names select_kernel_name(const std::string& kernel_name) {
+            Kernel_Names ret_obj = Kernel_Names::error;
+
+            if (kernel_name == config::NAIVE_BITONIC_KERNEL_NAME)
+                ret_obj = Kernel_Names::naive;
+
+            if (kernel_name == config::FAST_BITONIC_KERNEL_NAME)
+                ret_obj = Kernel_Names::fast;
+
+            return ret_obj;
         }
     };
 }

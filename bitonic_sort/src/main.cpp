@@ -7,7 +7,7 @@
 #include <CL/opencl.hpp>
 
 int main() {
-    ocl_utils::Environment env(config::KERNELS_PATH + config::FAST_BITONIC_KERNEL, config::FAST_BITONIC_KERNEL_NAME);
+    ocl_utils::Environment env(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
 
     int size;
     std::cin >> size;
@@ -17,7 +17,7 @@ int main() {
         std::cin >> data[i];
     }
 
-    bitonic::fast_bitonic_sort_gpu(env, data);
+    bitonic::sort(env, data);
 
     for (auto num : data)
         std::cout << num << " ";
