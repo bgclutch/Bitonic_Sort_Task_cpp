@@ -8,6 +8,7 @@ add_subdirectory(tests)
 option(ENABLE_ASAN OFF)
 
 target_compile_options(bitonic_sort PRIVATE
+    -O2
 $<$<CONFIG:Debug>:
     -Wall
     -Wextra

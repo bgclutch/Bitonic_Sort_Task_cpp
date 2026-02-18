@@ -1,1 +1,24 @@
--1796849 -1574142 -1033270 -952049 -798199 -596182 -30307 1284444 
+naive GPU {
+CPU time: 0 ms
+Wall time: 2294.19 ms
+Kernel time: 2182.22 ms
+Transfer time: 111.176 ms
+}
+fast GPU {
+CPU time: 0 ms
+Wall time: 805.392 ms
+Kernel time: 648.104 ms
+Transfer time: 155.477 ms
+}
+bitonic CPU {
+CPU time: 0.7 ms
+Wall time: 0 ms
+Kernel time: 0 ms
+Transfer time: 0 ms
+}
+std::sort {
+CPU time: 0.361 ms
+Wall time: 0 ms
+Kernel time: 0 ms
+Transfer time: 0 ms
+}
