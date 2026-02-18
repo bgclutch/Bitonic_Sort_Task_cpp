@@ -51,8 +51,8 @@ auto naive_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& 
     auto bitonicCall = cl::KernelFunctor<cl::Buffer, int, int>(env.get_kernel());
 
     auto kernel_begin = std::chrono::high_resolution_clock::now();
-    for (int stage = 2; stage <= paddedSize; stage *= 2) {
-        for (int step = stage / 2; step > 0; step /= 2) {
+    for (size_t stage = 2; stage <= paddedSize; stage *= 2) {
+        for (size_t step = stage / 2; step > 0; step /= 2) {
 
             bitonicCall(cl::EnqueueArgs(env.get_queue(), cl::NDRange(paddedSize)),
             kernel_buf,
@@ -80,10 +80,11 @@ auto naive_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& 
 
 template <typename ElemType = int>
 auto fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& data, const size_t paddedSize, const size_t bytes) {
-    int maxDeviceWorkItemSize  = env.get_device().getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
-    int maxKernelWorkItemSize = env.get_kernel().getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(env.get_device());
-    int maxAllowed = std::min(maxDeviceWorkItemSize, maxKernelWorkItemSize);
-    int localSize = 1;
+    size_t maxDeviceWorkItemSize  = env.get_device().getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+    size_t maxKernelWorkItemSize = env.get_kernel().getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(env.get_device());
+    size_t maxAllowed = std::min(maxDeviceWorkItemSize, maxKernelWorkItemSize);
+    size_t localSize = 1;
+    ocl_utils::Environment localNaive(env, config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
 
     while (localSize * 2 <= maxAllowed && localSize * 2 <= paddedSize)
         localSize *= 2;
@@ -105,24 +106,27 @@ auto fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& d
                 cl::Local(localSize * sizeof(ElemType)),
                 localSize);
 
+    env.get_queue().finish();
+    auto kernel_end = std::chrono::high_resolution_clock::now();
+    result.kernelTime += std::chrono::duration_cast<std::chrono::nanoseconds>(kernel_end - kernel_begin);
+
     if (paddedSize > localSize) {
-        ocl_utils::Environment localNaive(env, config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
+        kernel_begin = std::chrono::high_resolution_clock::now();
         auto mergeCall = cl::KernelFunctor<cl::Buffer, int, int>(localNaive.get_kernel());
 
-        for (int stage = localSize * 2; stage <= paddedSize; stage *= 2) {
-            for (int step = stage / 2; step > 0; step /= 2) {
+        for (size_t stage = localSize * 2; stage <= paddedSize; stage *= 2) {
+            for (size_t step = stage / 2; step > 0; step /= 2) {
                 mergeCall(cl::EnqueueArgs(localNaive.get_queue(), cl::NDRange(paddedSize)),
                 kernel_buf,
                 stage,
                 step);
             }
         }
-
+        env.get_queue().finish();
+        kernel_end = std::chrono::high_resolution_clock::now();
+        result.kernelTime += std::chrono::duration_cast<std::chrono::nanoseconds>(kernel_end - kernel_begin);
     }
-    env.get_queue().finish();
 
-    auto kernel_end = std::chrono::high_resolution_clock::now();
-    result.kernelTime = std::chrono::duration_cast<std::chrono::nanoseconds>(kernel_end - kernel_begin);
 
     transfer_begin = std::chrono::high_resolution_clock::now();
 
@@ -140,7 +144,7 @@ auto fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& d
 template <typename ElemType = int>
 auto sort(ocl_utils::Environment& env, std::vector<ElemType>& data) {
     size_t trueSize = data.size();
-    int paddedSize = ocl_utils::closest_pow_of_2(trueSize);
+    size_t paddedSize = ocl_utils::closest_pow_of_2(trueSize);
     size_t bytes = paddedSize * sizeof(ElemType);
 
     if (paddedSize > trueSize)

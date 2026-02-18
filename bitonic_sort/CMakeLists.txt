@@ -19,4 +19,5 @@ target_include_directories(bitonic_sort PRIVATE
 
 target_sources(bitonic_sort PRIVATE
     src/main.cpp
+    src/utils.cpp
 )

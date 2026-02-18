@@ -6,9 +6,13 @@ add_subdirectory(bitonic_sort)
 add_subdirectory(tests)
 
 option(ENABLE_ASAN OFF)
+option(ENABLE_BENCHMARK OFF)
+
+if(ENABLE_BENCHMARK)
+    add_subdirectory(benchmark)
+endif()
 
 target_compile_options(bitonic_sort PRIVATE
-    -O2
 $<$<CONFIG:Debug>:
     -Wall
     -Wextra

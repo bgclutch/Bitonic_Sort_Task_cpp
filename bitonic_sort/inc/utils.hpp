@@ -21,15 +21,9 @@ enum class CPU_TYPE {
 }
 
 namespace ocl_utils {
-int closest_pow_of_2(const int size) noexcept {
-    int power = 1;
-    while (size > power)
-        power *= 2;
+size_t closest_pow_of_2(const size_t size) noexcept;
 
-    return power;
-}
-
-    enum class Kernel_Names {
+enum class Kernel_Names {
     naive,
     fast,
     error

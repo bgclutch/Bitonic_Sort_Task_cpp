@@ -1,23 +1,23 @@
 naive GPU {
 CPU time: 0 ms
-Wall time: 3255.86 ms
-Kernel time: 3146.71 ms
-Transfer time: 108.227 ms
+Wall time: 3861.4 ms
+Kernel time: 3741.82 ms
+Transfer time: 118.847 ms
 }
 fast GPU {
 CPU time: 0 ms
-Wall time: 426.77 ms
-Kernel time: 321.706 ms
-Transfer time: 104.299 ms
+Wall time: 1065.85 ms
+Kernel time: 905.662 ms
+Transfer time: 159.117 ms
 }
 bitonic CPU {
-CPU time: 23.3 ms
+CPU time: 23.716 ms
 Wall time: 0 ms
 Kernel time: 0 ms
 Transfer time: 0 ms
 }
 std::sort {
-CPU time: 6.724 ms
+CPU time: 6.733 ms
 Wall time: 0 ms
 Kernel time: 0 ms
 Transfer time: 0 ms

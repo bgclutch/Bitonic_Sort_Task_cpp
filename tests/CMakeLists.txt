@@ -3,6 +3,7 @@ find_package(OpenCL REQUIRED)
 
 add_executable(tests
     Unit/test.cpp
+    ${CMAKE_SOURCE_DIR}/bitonic_sort/src/utils.cpp
 )
 
 target_compile_features(tests PUBLIC cxx_std_23)

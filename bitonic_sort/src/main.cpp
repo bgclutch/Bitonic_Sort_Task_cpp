@@ -1,48 +1,37 @@
-#include "bitonic_sort.hpp"
-#include "benchmark.hpp"
 #include "utils.hpp"
 #include "config.hpp"
+#include "bitonic_sort.hpp"
 #include <iostream>
 #include <fstream>
-#include <set>
 #include <vector>
-#include <chrono>
 #include <algorithm>
 #include <CL/opencl.hpp>
 
 int main() {
-    std::istream* input_data = &std::cin;
+    ocl_utils::Environment env(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
 
-    std::vector<int> data;
-    benchmark::getBenchmarkData(data, *input_data);
+    size_t size;
+    std::cin >> size;
 
-//-------------------------------naive kernel benchmark--------------------------------------//
-    ocl_utils::Environment naive_env(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
-    std::vector<int> naiveData = data;
-    auto resultNaive = benchmark::runGPU(naive_env, naiveData);
-    if (!std::is_sorted(naiveData.begin(), naiveData.end())) {
-        std::cerr << "Naive GPU FAILED to sort!" << std::endl;
+    if (!std::cin.good() || size <= 0) {
+        std::cerr << "wrong vector size";
+        return EXIT_FAILURE;
     }
-    benchmark::printRes("naive GPU", resultNaive);
 
-//-------------------------------fast kernel benchmark---------------------------------------//
-    ocl_utils::Environment fast_env(config::KERNELS_PATH + config::FAST_BITONIC_KERNEL, config::FAST_BITONIC_KERNEL_NAME);
-    std::vector<int> fastData = data;
-    auto resultFast = benchmark::runGPU(fast_env, fastData);
-    if (!std::is_sorted(naiveData.begin(), naiveData.end())) {
-        std::cerr << "Fast GPU FAILED to sort!" << std::endl;
+    std::vector<int> data(size, 0);
+
+    for (size_t i = 0; i != size; ++i) {
+        if (!(std::cin >> data[i])) {
+            std::cerr << "WRONG GIVEN KEY\n";
+            return EXIT_FAILURE;
+        }
     }
-    benchmark::printRes("fast GPU", resultFast);
 
-//-------------------------------bitonic on cpu benchmark------------------------------------//
-    std::vector<int> bitonicData = data;
-    auto resultBitonic = benchmark::runCPU(benchmark::CPU_TYPE::bitonic_sort, bitonicData);
-    benchmark::printRes("bitonic CPU", resultBitonic);
+    bitonic::sort(env, data);
 
-//-------------------------------std::sort benchmark-----------------------------------------//
-    std::vector<int> stdData = data;
-    auto resultStd = benchmark::runCPU(benchmark::CPU_TYPE::std_sort, stdData);
-    benchmark::printRes("std::sort", resultStd);
+    for (auto num : data)
+        std::cout << num << " ";
+    std::cout << std::endl;
 
     return EXIT_SUCCESS;
 }
