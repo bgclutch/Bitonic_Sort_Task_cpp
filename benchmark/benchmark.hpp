@@ -34,8 +34,8 @@ void getBenchmarkData(std::vector<ElemType>& benchmarkData, std::istream& input_
 }
 
 template <typename ElemType>
-auto runGPU(ocl_utils::Environment& env, std::vector<ElemType>& data) {
-    benchmark::BenchTimes result = bitonic::sort(env, data);
+auto runGPU(const ocl_utils::Kernel_Names& currentKernel, std::vector<ElemType>& data) {
+    benchmark::BenchTimes result = bitonic::sort(currentKernel, data);
     return result;
 }
 

@@ -25,8 +25,7 @@ size_t closest_pow_of_2(const size_t size) noexcept;
 
 enum class Kernel_Names {
     naive,
-    fast,
-    error
+    fast
 };
 
 class Environment final {
@@ -148,21 +147,13 @@ class Environment final {
         }
 
         if (err == CL_INVALID_KERNEL_NAME) {
-            std::cerr << "Hint: Check spelling in .cl file!" << std::endl;
+            std::cerr << "Check spelling in .cl file!" << std::endl;
             }
         return kernel;
     }
 
     Kernel_Names select_kernel_name(const std::string& kernel_name) {
-        Kernel_Names ret_obj = Kernel_Names::error;
-
-        if (kernel_name == config::NAIVE_BITONIC_KERNEL_NAME)
-            ret_obj = Kernel_Names::naive;
-
-        if (kernel_name == config::FAST_BITONIC_KERNEL_NAME)
-            ret_obj = Kernel_Names::fast;
-
-        return ret_obj;
+        return (kernel_name == config::NAIVE_BITONIC_KERNEL_NAME) ? Kernel_Names::naive : Kernel_Names::fast;
     }
 };
 } // namespace ocl_utils

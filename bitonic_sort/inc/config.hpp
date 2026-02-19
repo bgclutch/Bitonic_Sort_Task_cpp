@@ -9,8 +9,9 @@ namespace config {
     const std::string KERNELS_PATH = "kernels/";
 #endif
 
-const std::string NAIVE_BITONIC_KERNEL      = "naive_kernel.cl";
-const std::string NAIVE_BITONIC_KERNEL_NAME = "naive_bitonic_sort_kernel";
-const std::string FAST_BITONIC_KERNEL       = "fast_kernel.cl";
-const std::string FAST_BITONIC_KERNEL_NAME  = "fast_bitonic_sort_kernel";
+const std::string NAIVE_BITONIC_KERNEL           = "naive_kernel.cl";
+const std::string NAIVE_BITONIC_KERNEL_NAME      = "naive_bitonic_sort_kernel";
+const std::string FAST_BITONIC_KERNEL            = "fast_kernel.cl";
+const std::string FAST_BITONIC_KERNEL_NAME       = "fast_bitonic_sort_kernel";
+const std::string FAST_BITONIC_MERGE_KERNEL_NAME = "fast_bitonic_merge_kernel";
 } // namespace config

@@ -8,8 +8,6 @@
 #include <CL/opencl.hpp>
 
 int main() {
-    ocl_utils::Environment env(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
-
     size_t size;
     std::cin >> size;
 
@@ -27,7 +25,7 @@ int main() {
         }
     }
 
-    bitonic::sort(env, data);
+    bitonic::sort(ocl_utils::Kernel_Names::fast, data);
 
     for (auto num : data)
         std::cout << num << " ";

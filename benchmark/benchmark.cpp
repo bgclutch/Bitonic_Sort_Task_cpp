@@ -31,18 +31,16 @@ int main(int argc, char** argv) {
     benchmark::getBenchmarkData(data, input_data);
 
 //-------------------------------naive kernel benchmark--------------------------------------//
-    ocl_utils::Environment naive_env(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
     std::vector<int> naiveData = data;
-    auto resultNaive = benchmark::runGPU(naive_env, naiveData);
+    auto resultNaive = benchmark::runGPU(ocl_utils::Kernel_Names::naive, naiveData);
     if (!std::is_sorted(naiveData.begin(), naiveData.end())) {
         std::cerr << "Naive GPU FAILED to sort!" << std::endl;
     }
     benchmark::printRes("naive GPU", resultNaive);
 
 //-------------------------------fast kernel benchmark---------------------------------------//
-    ocl_utils::Environment fast_env(config::KERNELS_PATH + config::FAST_BITONIC_KERNEL, config::FAST_BITONIC_KERNEL_NAME);
     std::vector<int> fastData = data;
-    auto resultFast = benchmark::runGPU(fast_env, fastData);
+    auto resultFast = benchmark::runGPU(ocl_utils::Kernel_Names::fast, fastData);
     if (!std::is_sorted(naiveData.begin(), naiveData.end())) {
         std::cerr << "Fast GPU FAILED to sort!" << std::endl;
     }

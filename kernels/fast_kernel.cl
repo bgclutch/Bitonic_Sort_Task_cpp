@@ -36,3 +36,22 @@ __kernel void fast_bitonic_sort_kernel(__global int2* g_data, __local int* l_dat
     data.y = l_data[local_id * 2 + 1];
     g_data[global_id] = data;
 }
+
+
+__kernel void fast_bitonic_merge_kernel(__global int* g_data, int stage, int step) {
+    int gid = get_global_id(0);
+
+    int left_index = (gid / step) * (step * 2) + (gid & (step - 1));
+    int right_index = left_index + step;
+
+    int a = g_data[left_index];
+    int b = g_data[right_index];
+
+    bool isAscending = (left_index & stage) == 0;
+
+    int min_val = min(a, b);
+    int max_val = max(a, b);
+
+    g_data[left_index]  = isAscending ? min_val : max_val;
+    g_data[right_index] = isAscending ? max_val : min_val;
+}
