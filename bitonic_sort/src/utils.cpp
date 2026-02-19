@@ -1,5 +1,4 @@
 #include "utils.hpp"
-#include <cstddef>
 
 namespace ocl_utils {
 size_t closest_pow_of_2(const size_t size) noexcept {

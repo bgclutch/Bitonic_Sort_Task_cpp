@@ -6,13 +6,14 @@
 #include <fstream>
 #include <set>
 #include <chrono>
+#include <CL/opencl.hpp>
 
 namespace benchmark {
 void printRes(const std::string& nameRes, const BenchTimes& res) {
     std::cout << nameRes << " {\n"
-              << "CPU time: "      << res.CPUTime.count() / 1000. << " ms\n"
-              << "Wall time: "     << res.WallTime.count() / 1000. << " ms\n"
-              << "Kernel time: "   << res.kernelTime.count() / 1000. << " ms\n"
+              << "CPU time:      " << res.CPUTime.count() / 1000. << " ms\n"
+              << "Wall time:     " << res.WallTime.count() / 1000. << " ms\n"
+              << "Kernel time:   " << res.kernelTime.count() / 1000. << " ms\n"
               << "Transfer time: " << res.TransferTime.count() / 1000. << " ms\n}\n";
 }
 

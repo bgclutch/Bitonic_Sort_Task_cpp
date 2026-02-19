@@ -1,34 +1,38 @@
-__kernel void fast_bitonic_sort_kernel(__global int* g_data, __local int* l_data, int local_work_group_size) {
+__kernel void fast_bitonic_sort_kernel(__global int2* g_data, __local int* l_data) {
     int global_id = get_global_id(0);
     int local_id = get_local_id(0);
 
-    l_data[local_id] = g_data[global_id];
+    int2 data = g_data[global_id];
+    l_data[local_id * 2]     = data.x;
+    l_data[local_id * 2 + 1] = data.y;
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    for (int stage = 2; stage <= local_work_group_size; stage *= 2) {
-        for (int step = stage / 2; step > 0; step /= 2) {
-            int cur_partner = local_id + step;
+    int total_elements = get_local_size(0) * 2;
+    int global_offset = get_group_id(0) * total_elements;
 
-            if ((local_id & step) == 0) {
-                bool isAscending = (global_id & stage) == 0;
-                int left  = l_data[local_id];
-                int right = l_data[cur_partner];
-                if (isAscending) {
-                    if (left > right) {
-                        l_data[local_id] = right;
-                        l_data[cur_partner] = left;
-                    }
-                }
-                else {
-                    if (left < right) {
-                        l_data[local_id] = right;
-                        l_data[cur_partner] = left;
-                    }
-                }
-            }
-        barrier(CLK_LOCAL_MEM_FENCE);
+    for (int stage = 2; stage <= total_elements; stage *= 2) {
+        for (int step = stage / 2; step > 0; step /= 2) {
+
+            int left_index = (local_id / step) * (step * 2) + (local_id & (step - 1));
+            int right_index = left_index + step;
+
+            int left = l_data[left_index];
+            int right = l_data[right_index];
+
+            int current_global_index = global_offset + left_index;
+            bool isAscending = (current_global_index & stage) == 0;
+
+            int min_val = min(left, right);
+            int max_val = max(left, right);
+
+            l_data[left_index]  = isAscending ? min_val : max_val;
+            l_data[right_index] = isAscending ? max_val : min_val;
+
+            barrier(CLK_LOCAL_MEM_FENCE);
         }
     }
 
-    g_data[global_id] = l_data[local_id];
+    data.x = l_data[local_id * 2];
+    data.y = l_data[local_id * 2 + 1];
+    g_data[global_id] = data;
 }
