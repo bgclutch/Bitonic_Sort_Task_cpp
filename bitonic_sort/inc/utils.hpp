@@ -97,7 +97,7 @@ class Environment final {
 
     cl::Device select_device(cl::Platform& platform) {
         std::vector<cl::Device> devices;
-        platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+        platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
         return devices.front();
     }
 
