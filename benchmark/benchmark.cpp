@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
     std::vector<int> data;
     benchmark::getBenchmarkData(data, input_data);
 
+    try {
 //-------------------------------naive kernel benchmark--------------------------------------//
     std::vector<int> naiveData = data;
     auto resultNaive = benchmark::runGPU(ocl_utils::Kernel_Names::naive, naiveData);
@@ -55,6 +56,13 @@ int main(int argc, char** argv) {
     std::vector<int> stdData = data;
     auto resultStd = benchmark::runCPU(benchmark::CPU_TYPE::std_sort, stdData);
     benchmark::printRes("std::sort", resultStd);
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Standard Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    } catch (const std::exception& e) {
+        std::cerr << "Unknown critical error!" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

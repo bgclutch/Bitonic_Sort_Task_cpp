@@ -25,7 +25,15 @@ int main() {
         }
     }
 
-    bitonic::sort(ocl_utils::Kernel_Names::fast, data);
+    try {
+        bitonic::sort(ocl_utils::Kernel_Names::fast, data);
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Standard Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    } catch (const std::exception& e) {
+        std::cerr << "Unknown critical error!" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     for (auto num : data)
         std::cout << num << " ";

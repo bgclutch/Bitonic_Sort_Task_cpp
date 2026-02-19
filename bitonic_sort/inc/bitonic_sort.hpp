@@ -88,16 +88,15 @@ auto naive_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& 
 template <typename ElemType = int>
 auto fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& data, const size_t paddedSize,
                                                                                      const size_t bytes) {
-    int maxDeviceWorkItemSize  = env.get_device().getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
-    int maxKernelWorkItemSize = env.get_kernel().getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(env.get_device());
-    int maxAllowed = std::min(maxDeviceWorkItemSize, maxKernelWorkItemSize);
-    int localSize = 1;
+    unsigned int maxDeviceWorkItemSize  = env.get_device().getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+    unsigned int maxKernelWorkItemSize = env.get_kernel().getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(env.get_device());
+    unsigned int maxAllowed = std::min(maxDeviceWorkItemSize, maxKernelWorkItemSize);
+    unsigned int localSize = 1;
 
-    cl::Kernel sortKernel(env.get_program(),  config::FAST_BITONIC_KERNEL_NAME.c_str());
-    cl::Kernel mergeKernel(env.get_program(), config::FAST_BITONIC_MERGE_KERNEL_NAME.c_str());
+    ocl_utils::Environment localEnv(config::KERNELS_PATH + config::NAIVE_BITONIC_KERNEL, config::NAIVE_BITONIC_KERNEL_NAME);
 
-    auto bitonicCall = cl::KernelFunctor<cl::Buffer, cl::LocalSpaceArg>(sortKernel);
-    auto mergeCall   = cl::KernelFunctor<cl::Buffer, int, int>(mergeKernel);
+    auto bitonicCall = cl::KernelFunctor<cl::Buffer, cl::LocalSpaceArg>(env.get_kernel());
+    auto mergeCall   = cl::KernelFunctor<cl::Buffer, int, int>(localEnv.get_kernel());
 
     while (localSize * 2 <= maxAllowed && localSize * 2 <= paddedSize)
         localSize *= 2;
@@ -125,7 +124,7 @@ auto fast_bitonic_sort_gpu(ocl_utils::Environment& env, std::vector<ElemType>& d
         kernel_begin = std::chrono::high_resolution_clock::now();
         for (size_t stage = localSize * 4; stage <= paddedSize; stage *= 2) {
             for (size_t step = stage / 2; step > 0; step /= 2) {
-                mergeCall(cl::EnqueueArgs(env.get_queue(), cl::NDRange(paddedSize / 2)),
+                mergeCall(cl::EnqueueArgs(env.get_queue(), cl::NDRange(paddedSize)),
                 kernel_buf,
                 stage,
                 step);

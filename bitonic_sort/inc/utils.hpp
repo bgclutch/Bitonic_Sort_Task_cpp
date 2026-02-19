@@ -148,7 +148,7 @@ class Environment final {
 
         if (err == CL_INVALID_KERNEL_NAME) {
             std::cerr << "Check spelling in .cl file!" << std::endl;
-            }
+        }
         return kernel;
     }
 
