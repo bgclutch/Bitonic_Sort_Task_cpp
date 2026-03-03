@@ -31,6 +31,9 @@ int main() {
         std::cerr << "Standard Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     } catch (const std::exception& e) {
+        std::cerr << "Critical error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    } catch (...) {
         std::cerr << "Unknown critical error!" << std::endl;
         return EXIT_FAILURE;
     }

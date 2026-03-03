@@ -92,14 +92,62 @@ class Environment final {
     cl::Platform select_platform() {
         std::vector<cl::Platform> platforms;
         cl::Platform::get(&platforms);
-        return platforms.front();
+
+        if (platforms.empty()) {
+            throw std::runtime_error("No OpenCL platforms found.");
+        }
+
+        cl::Platform best_platform = platforms.front();
+        long long max_score = -1;
+
+        for (const auto& plt : platforms) {
+            std::vector<cl::Device> devices;
+            plt.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+
+            for (const auto& dev : devices) {
+                long long current_score = 0;
+
+                cl_device_type type = dev.getInfo<CL_DEVICE_TYPE>();
+                cl_uint units = dev.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+
+                if (type & CL_DEVICE_TYPE_GPU) {
+                    current_score += 100000;
+
+                    std::string vendor = dev.getInfo<CL_DEVICE_VENDOR>();
+                    if (vendor.find("Intel") == std::string::npos)
+                        current_score += 50000;
+                }
+                else if (type & CL_DEVICE_TYPE_CPU) {
+                    current_score += 1000;
+                }
+
+                current_score += units;
+
+                if (current_score > max_score) {
+                    max_score = current_score;
+                    best_platform = plt;
+                }
+            }
+        }
+
+        if (max_score == -1) {
+             throw std::runtime_error("No valid OpenCL devices found in any platform.");
+        }
+
+        std::cerr << "Selected Platform: " << best_platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
+        return best_platform;
     }
 
     cl::Device select_device(cl::Platform& platform) {
         std::vector<cl::Device> devices;
         platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+
+        if (devices.empty())
+            throw std::runtime_error("No devices found on selected platform");
+
         return devices.front();
     }
+
 
     cl::Program create_program(cl::Context& context, cl::Device& device, const std::string& kernel_path) {
         std::ifstream bitonicKernelFile(kernel_path);
